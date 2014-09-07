@@ -19,7 +19,58 @@ class Welcome extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		$this->load->view('index');
+	}
+	
+	public function register(){
+		if($this->input->post('btnRegister')){
+			$this->load->model('User');
+			unset($_POST['pwdConfirmPassword']);
+			unset($_POST['btnRegister']);
+			$data = $this->input->post();
+			$user = $this->User->insert_user($data);
+			if($user){
+				$this->session->set_flashdata('dispMessage', 'Register Successfully!');
+			}else{
+				$this->session->set_flashdata('dispMessage', 'Error occur while register user!');
+			}
+			redirect(base_url().'welcome/login','location');
+		}
+		$this->load->view('register');
+	}
+	
+	public function checkUserName(){
+		$this->load->model('User');
+		$username = $this->input->post('user_name');
+		echo $this->User->checkUserName($username);
+	}
+	
+	public function checkEmail(){
+		$this->load->model('User');
+		$email = $this->input->post('e_mail');
+		echo $this->User->checkEmail($email);
+	}
+	
+	public function login(){
+		if($this->input->post('btnLogin')){
+			$this->load->model('User');
+			$data = $this->input->post();
+			$user = $this->User->checkLogin($data);
+			//echo $this->db->last_Query();exit;
+			if($user){
+				redirect(base_url().'welcome/user','location');
+			}else{
+				$this->session->set_flashdata('dispMessage', 'Incorrect Username or Password!');
+				redirect(base_url().'welcome/login','location');
+			}
+		}
+		$this->load->view('login');
+	}
+	
+	public function user(){
+		$this->load->model('User');
+		$data['user'] = $this->User->displayUser();
+		$this->load->view('user',$data);
 	}
 }
 
