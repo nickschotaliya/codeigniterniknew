@@ -34,7 +34,7 @@ class User extends CI_Model {
 	function checkLogin($data){
 		$this -> db -> select();
 		$this -> db -> from('user');
-		$this -> db -> where(array('user_name'=>$data['user_name'],'pass_word'=>$data['pass_word']));
+		$this -> db -> where(array('user_name'=>$data['user_name'],'pass_word'=>md5($data['pass_word'])));
 		$this -> db -> limit(1);
 		$query = $this -> db -> get();
 		if($query -> num_rows() == 1){

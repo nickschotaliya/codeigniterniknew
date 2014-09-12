@@ -27,6 +27,7 @@ class Welcome extends CI_Controller {
 			$this->load->model('User');
 			unset($_POST['pwdConfirmPassword']);
 			unset($_POST['btnRegister']);
+			$_POST['pass_word'] = md5($_POST['pass_word']); 
 			$data = $this->input->post();
 			$user = $this->User->insert_user($data);
 			if($user){
@@ -58,6 +59,13 @@ class Welcome extends CI_Controller {
 			$user = $this->User->checkLogin($data);
 			//echo $this->db->last_Query();exit;
 			if($user){
+				$newdata = array(
+						'id'  => $user[0]->user_id,
+						'username'  => $user[0]->user_name,
+						'logged_in' => TRUE
+				);
+				
+				$this->session->set_userdata($newdata);
 				redirect(base_url().'welcome/user','location');
 			}else{
 				$this->session->set_flashdata('dispMessage', 'Incorrect Username or Password!');
@@ -68,6 +76,9 @@ class Welcome extends CI_Controller {
 	}
 	
 	public function user(){
+		if(!$this->session->userdata('logged_in')){
+			redirect(base_url().'welcome/login','location');
+		}
 		$this->load->model('User');
 		$data['user'] = $this->User->displayUser();
 		$this->load->view('user',$data);
